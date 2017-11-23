@@ -3,3 +3,6 @@ bower_components
 
 # Dependency directories
 node_modules/
+
+#app config
+config.json

@@ -1,16 +1,11 @@
 # Alice : Personal Assistant
 
-##Built using:  
+##v1 Built using:
 - Google Cloud Speech API
-- Sonus : https://github.com/evancohen/sonus
+- annyang : https://github.com/TalAter/annyang
+- ResponsiveVoice.JS : https://responsivevoice.org/
 
-
-You will likely get an error starting app about "Error: libcblas.so.3: cannot open shared object file: No such file or directory". Be sure to run:  
-```
-sudo apt-get install libatlas-base-dev
-```
-
-ToDo:
+v1 ToDo:
 
 Add class wrapper for all of these custom things
 
@@ -21,3 +16,15 @@ Add method for responding with inflections
 Automate adding option hotword to sub conversation commands
 
 For her translations, create a map of ISO codes that should use which voice to speak them so that she can speak mandarin (right now she just prints the word but says nothing)
+
+
+##v2 Built using:
+- Dialogflow : https://dialogflow.com
+
+You need to add your own config.json file containing:
+```
+{
+    "dialogflow_accessToken" : "YOUR ACCESS TOKEN"
+}
+```
+we dont include it here for obvious security reasons

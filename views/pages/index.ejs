@@ -1,0 +1,208 @@
+<% include ../partials/header %>
+<style>
+body {
+    background: #2196f3;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;
+    -ms-transition: .5s;
+    -o-transition: .5s;
+    transition: .5s;
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+<script src='spotify-web-api.js'></script>
+<script src='isoLangs.js'></script>
+<script>
+function doTranslate(options, callback) {
+    var sourceText = ''
+    if (options.sourceText){
+        sourceText = options.sourceText;
+    }
+
+    var sourceLang = 'auto';
+    if (options.sourceLang){
+        sourceLang = options.sourceLang;
+    }
+
+    var targetLangFriendly = '';
+    var targetLang = '';
+    if (options.targetLang){
+        targetLang = options.targetLang;
+    }
+    // match it to the ISO language code
+    for (var i = isoLangsCodes.length - 1; i >= 0; i--) {
+        if (targetLang == isoLangs[isoLangsCodes[i]].name || targetLang == isoLangs[isoLangsCodes[i]].nativeName) {
+            targetLangFriendly = isoLangs[isoLangsCodes[i]].name;
+            targetLang = isoLangsCodes[i];
+        }
+    }
+    if (!targetLang.length) {
+        callback('Oops, I cannot get the translation of ' + targetLangFriendly + '. I don\'t know that language.');
+        return false;
+    }
+    var translatedText = '';
+    var url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl=" + targetLang + "&dt=t&q=" + encodeURI(sourceText);
+
+    $.get(url, function(data) {
+        try {
+            var result = data;
+        }
+        catch (e) {
+            console.log(e)
+            console.log(data)
+            callback('Oops, I cannot get the translation. ' + e);
+            return false;
+        }
+        translatedText = result[0][0][0];
+        if (typeof callback == 'function') {
+            callback(sourceText + '. In ' + targetLangFriendly + ' is. ' + translatedText);
+            return true;
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+if (annyang) {
+    var voice = "UK English Female";
+    var listeningSound = new Audio('listening.wav');
+    var stopListeningSound = new Audio('close.wav');
+    var attentionSpanSeconds = 10;
+    // initialize timeout
+    var attentionTimeout = setTimeout(function(){
+        resetConversation();
+    }, attentionSpanSeconds * 1000);
+
+    function resetConversation() {
+        document.body.style.backgroundColor = "#2196f3";
+        annyang.removeCommands();
+        // Add our hotword commands to annyang
+        annyang.addCommands(hotwordCommands);
+    }
+
+    function conversationRespond(message, voiceOptions, callback) {
+        annyang.abort();
+        if (typeof voiceOptions == 'undefined') {
+            voiceOptions = {};
+        }
+        if (typeof voiceOptions.volume == 'undefined') {
+            voiceOptions.volume = 1;
+        }
+        voiceOptions.onstart = function() {
+            document.body.style.backgroundColor = "#9c27b0";
+        };
+        voiceOptions.onend = function() {
+            annyang.resume();
+            callback();
+        };
+        responsiveVoice.speak(message, voice, voiceOptions);
+    }
+
+    function activateCommand(action) {
+        if (typeof attentionTimeout !== 'undefined') {
+            clearTimeout(attentionTimeout);
+        }
+        if (typeof action == 'function') {
+            action(function() {
+                attentionTimeout = setTimeout(function(){
+                    console.log('Conversation timed out.')
+                    stopListeningSound.play();
+                    resetConversation();
+                }, attentionSpanSeconds * 1000);
+            });
+        }
+        else {
+            console.log('No action provided for this command');
+            attentionTimeout = setTimeout(function(){
+                console.log('Conversation timed out.')
+                stopListeningSound.play();
+                resetConversation();
+            }, attentionSpanSeconds * 1000);
+        }
+    }
+
+    // Let's define a command.
+    var contexts = {
+        '(hey) (Alice) say hi to *name': function(name) { activateCommand(function(callback) {
+            conversationRespond('Hi ' + name + '!', {}, callback);
+        })},
+        '(it)(that)(\'s) (is) not how you (pronounce) (say) my name': function(name) { activateCommand(function(callback) {
+            conversationRespond('Sorry! So so sorry! Forgive me master.', {}, callback);
+        })},
+        '(hey) (Alice) hello': function() { activateCommand(function(callback) {
+            conversationRespond('Hi!', {}, callback);
+        })},
+        '(hey) (Alice) how\'s it going': function() { activateCommand(function(callback) {
+            conversationRespond('I am wonderful!', {}, callback);
+        })},
+        '(hey) (Alice) how are you': function() { activateCommand(function(callback) {
+            conversationRespond('I am wonderful!', {}, callback);
+        })},
+        '(hey) (Alice) what(\'s) (is) up': function() { activateCommand(function(callback) {
+            conversationRespond('Not much. Just chilling. You know how I do.', {}, callback);
+        })},
+        '(hey) (Alice) thank(s) (you) (a lot)': function() { activateCommand(function(callback) {
+            conversationRespond('No problem. Happy to help!', {}, callback);
+        })},
+        '(hey) (Alice) what time is it (right now)': function() { activateCommand(function(callback) {
+            conversationRespond('It is ' + moment().format('h:mm a'), {}, callback);
+        })},
+        '(hey) (Alice) what day is (today) (it)': function() { activateCommand(function(callback) {
+            conversationRespond('It is ' + moment().format('dddd'), {}, callback);
+        })},
+        '(hey) (Alice) what is (today\'s) (the) date': function() { activateCommand(function(callback) {
+            conversationRespond('It is ' + moment().format('dddd, MMMM Do YYYY'), {}, callback);
+        })},
+        '(hey) (Alice) translate *sourceText in *targetLang': function(sourceText, targetLang) { activateCommand(function(callback) {
+            doTranslate({sourceText: sourceText, targetLang: targetLang}, function(translation) {
+                conversationRespond(translation, {}, callback);
+            })
+        })},
+        '(hey) (Alice) how do you say *sourceText in *targetLang': function(sourceText, targetLang) { activateCommand(function(callback) {
+            doTranslate({sourceText: sourceText, targetLang: targetLang}, function(translation) {
+                conversationRespond(translation, {}, callback);
+            })
+        })},
+    };
+
+    // Define the hotword.
+    var hotwordCommands = {
+        '(hey) (hello) (yo) Alice (*extra)': function(extra) { activateCommand(function(callback) {
+            console.log('Alice activated');
+            document.body.style.backgroundColor = "#673ab7";
+            annyang.removeCommands();
+            annyang.addCommands(contexts);
+            callback();
+            if (typeof extra !== 'undefined' && extra.length) {
+                annyang.trigger(extra);
+            }
+            else {
+                listeningSound.play();
+            }
+        })},
+    };
+
+
+    // initialize our conversation
+    resetConversation()
+
+    // Start listening.
+    annyang.debug(true);
+    annyang.start();
+}
+</script>
+<% include ../partials/footer %>

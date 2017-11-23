@@ -1,0 +1,18 @@
+{
+  "name": "alice",
+  "version": "1.0.0",
+  "description": "Personal Assistant",
+  "main": "alice.js",
+  "directories": {
+    "resources": "resources"
+  },
+  "keywords": [],
+  "author": "reeseftw@gmail.com",
+  "dependencies": {
+    "@google-cloud/speech": "^0.10.3",
+    "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "moment": "^2.19.1",
+    "sonus": "^0.1.8"
+  }
+}

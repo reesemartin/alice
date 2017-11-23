@@ -1,11 +1,11 @@
 # Alice : Personal Assistant
 
-##v1 Built using:
+## v1 Built using:
 - Google Cloud Speech API
 - annyang : https://github.com/TalAter/annyang
 - ResponsiveVoice.JS : https://responsivevoice.org/
 
-v1 ToDo:
+### v1 ToDo:
 
 Add class wrapper for all of these custom things
 
@@ -18,7 +18,7 @@ Automate adding option hotword to sub conversation commands
 For her translations, create a map of ISO codes that should use which voice to speak them so that she can speak mandarin (right now she just prints the word but says nothing)
 
 
-##v2 Built using:
+## v2 Built using:
 - Dialogflow : https://dialogflow.com
 
 You need to add your own config.json file containing:
